@@ -765,7 +765,7 @@ function About() {
   );
 }
 
-
+function CartPage({ cart, removeFromCart, openCheckout }) {
   const total = cart.reduce((sum, c) => sum + c.price, 0);
   return (
     <div className="ir-fade-in space-y-6 pb-10 max-w-2xl">
