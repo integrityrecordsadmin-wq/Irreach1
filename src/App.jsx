@@ -72,7 +72,7 @@ const RINGTONES = TRACKS.map((t, i) => ({
   url: toDirectLink(AUDIO_FILES[i]),
 }));
 
-const EBOOK = {
+const EBOOK = {downloadUrl: "/integrity-records-music-contract-guide.pdf",
   id: "ebook-contract",
   type: "ebook",
   title: "What to Look Out For Before Signing a Music Contract",
@@ -80,7 +80,7 @@ const EBOOK = {
   price: 8.99,
 };
 
-const PLANNER = {
+const PLANNER = {downloadUrl: "/integrity-records-daily-planner.pdf",
   id: "planner-daily",
   type: "planner",
   title: "Daily Planner for the Working Artist",
