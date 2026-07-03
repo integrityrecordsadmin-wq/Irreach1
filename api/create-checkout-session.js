@@ -44,8 +44,8 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 // under Product Catalog) so Stripe can handle recurring billing correctly.
 // Paste the Price IDs here after creating them.
 const SUBSCRIPTION_PRICE_IDS = {
-  "sub-monthly": "price_REPLACE_WITH_MONTHLY_PRICE_ID",
-  "sub-yearly": "price_REPLACE_WITH_YEARLY_PRICE_ID",
+  "sub-monthly": "price_1TotlICWc6rJyyWeqybbEE8n",
+  "sub-yearly": "price_1TotlICWc6rJyyWeaeTycZqo",
 };
 
 module.exports = async (req, res) => {
