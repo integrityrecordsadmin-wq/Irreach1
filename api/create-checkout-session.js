@@ -37,7 +37,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const Stripe = require("stripe");
+import Stripe from "stripe";
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Subscription items use Stripe Prices (set up once in the Stripe Dashboard
@@ -48,7 +48,7 @@ const SUBSCRIPTION_PRICE_IDS = {
   "sub-yearly": "price_1TotlICWc6rJyyWeaeTycZqo",
 };
 
-module.exports = async (req, res) => {
+   export default async (req, res) => {
   // Basic CORS so the app (hosted on a different domain) can call this.
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
