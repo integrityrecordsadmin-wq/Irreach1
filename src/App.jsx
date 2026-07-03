@@ -814,7 +814,7 @@ function CartPage({ cart, removeFromCart, openCheckout }) {
    alongside this file), paste its URL below. Until then, this stays
    empty and checkout runs in demo mode.
    ========================================================================= */
-const STRIPE_CHECKOUT_ENDPOINT = ""; // e.g. "https://your-backend.example.com/create-checkout-session"
+const STRIPE_CHECKOUT_ENDPOINT = "/api/create-checkout-session"; // e.g. "https://your-backend.example.com/create-checkout-session"
 
 /* =========================================================================
    CHECKOUT MODAL
