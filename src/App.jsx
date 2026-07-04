@@ -998,7 +998,11 @@ export default function App() {
   const [library, setLibrary] = useState({ ringtones: [], ebook: false, planner: false, subscription: null });
   const player = useAudioPlayer();
 
-  useEffect(() => { loadLibrary().then(setLibrary); }, []);
+  useEffect(() => { loadLibrary().then(setLibrary); }, []);useEffect(() => {
+  const openSub = () => setPage("subscription");
+  window.addEventListener("open-subscribe", openSub);
+  return () => window.removeEventListener("open-subscribe", openSub);
+}, []);
 
   const addToCart = (item) => {
     setCart((prev) => (prev.some((c) => c.id === item.id) ? prev : [...prev, item]));
