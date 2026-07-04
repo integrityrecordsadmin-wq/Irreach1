@@ -4,7 +4,8 @@ import {
   Share2, Check, X, Lock, CreditCard, Sparkles, Download, Star,
   ShieldCheck, PenLine, Sunrise, Quote, ChevronRight, Menu, Trash2,
   Copy, Link as LinkIcon, User,
-} from "lucide-react";
+} from "lucide-react";import GospelConnection from "./GospelConnection";
+import GospelConnectionDoor from "./GospelConnectionDoor";
 
 /* =========================================================================
    AUDIO SOURCE CONFIG
@@ -314,7 +315,7 @@ function Home({ go }) {
           </div>
           <Seal size={92} />
         </div>
-      </section>
+      </section><div className="mt-10"><GospelConnectionDoor onEnter={() => go("gospel-connection")} /></div>
 
       <section className="grid md:grid-cols-3 gap-4">
         {[
@@ -1031,7 +1032,7 @@ export default function App() {
         {page === "shop" && <Shop addToCart={addToCart} cart={cart} library={library} />}
         {page === "journal" && <Journal />}
         {page === "cart" && <CartPage cart={cart} removeFromCart={removeFromCart} openCheckout={() => setCheckoutOpen(true)} />}
-        {page === "about" && <About />}
+        {page === "about" && <About />}{page === "gospel-connection" && <GospelConnection isSubscriber={!!library.subscription} currentUser={{ id: "owner", name: "Integrity Records", avatarHue: "#7A2E2E" }} />}
       </main>
 
       <footer className="max-w-5xl mx-auto px-4 md:px-6 py-8 text-center space-y-2">
