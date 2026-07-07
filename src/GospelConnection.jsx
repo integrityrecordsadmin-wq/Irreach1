@@ -271,7 +271,7 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
         <p style={{ color: "#8A6D2F", fontSize: 13.5, fontStyle: "italic", margin: 0 }}>
           "Let us consider how we may spur one another on toward love and good deeds." — Hebrews 10:24
         </p>
-      </div>{isSubscriber && ( {isSubscriber && (
+      </div>{isSubscriber && ( 
       <div
         style={{
           marginBottom: 28,
