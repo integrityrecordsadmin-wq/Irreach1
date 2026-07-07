@@ -288,9 +288,8 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
         <div style={{ fontSize: 13, color: "#8A6D2F" }}>
           Coming soon
         </div>
-      </div>
-    )}
-    {isSubscriber && ({
+      </div> 
+    {isSubscriber && (
       <div
         style={{
           marginBottom: 28,
@@ -309,6 +308,7 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
         </div>
       </div>
     )}
+    {isSubscriber && (
       <a
         href="https://calendly.com/integrityrecordsadmin/30min"
         target="_blank"
@@ -325,6 +325,46 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
           textDecoration: "none",
           marginBottom: 28,
         }}
+      >
+        Book a Free 1-on-1 Session with Chris
+      </a>
+    )}
+    
+          
+          
+          
+
+          
+        
+        
+      
+      
+        
+      
+        
+        
+          
+      
+      
+    
+    
+        
+
+
+        
+        
+          
+
+          
+          
+          
+          
+          
+          
+        
+
+          
+        
       >
         Book a Free 1-on-1 Session with Chris
       </a>
