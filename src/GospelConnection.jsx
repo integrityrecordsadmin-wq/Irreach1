@@ -289,26 +289,32 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
           Coming soon
         </div>
       </div> 
-    {isSubscriber && (
-      <div
-        style={{
-          marginBottom: 28,
-          borderRadius: 12,
-          background: `${GOLD}15`,
-          border: `1px solid ${GOLD}55`,
-          padding: "28px 20px",
-          textAlign: "center",
-        }}
-      >
-        <div style={{ fontSize: 14, color: NAVY, fontWeight: 700, marginBottom: 4 }}>
-          🎥 A Personal Welcome from Chris
-        </div>
-        <div style={{ fontSize: 13, color: "#8A6D2F" }}>
-          Coming soon
-        </div>
-      </div>
-    )}
-    {isSubscriber && (
+    
+
+
+      
+        
+          
+          
+          
+          
+          
+
+
+
+          
+        
+      
+        
+          
+        
+        
+          
+        
+      
+
+    
+
       <a
         href="https://calendly.com/integrityrecordsadmin/30min"
         target="_blank"
