@@ -76,7 +76,7 @@ const RINGTONES = TRACKS.map((t, i) => ({
 const EBOOK = {downloadUrl: "/integrity-records-music-contract-guide.pdf",
   id: "ebook-contract",
   type: "ebook",
-  title: "What to Look Out For Before Signing a Music Contract",
+  title: "What You Need to Understand Before Signing a Music Contract!",
   blurb: "A plain-language guide to the clauses that quietly cost artists their masters, their royalties, and their voice — written so you can walk into any room and read the fine print yourself.",
   price: 8.99,
 };
