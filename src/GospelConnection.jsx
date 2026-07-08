@@ -289,33 +289,10 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
           Coming soon
         </div>
       </div> 
-    
-
-
-      
+    )}
+    {isSubscriber && (  
         
-          
-          
-          
-          
-          
-
-
-
-          
-        
-      
-        
-          
-        
-        
-          
-        
-      
-
-    
-
-      <a
+    <a
         href="https://calendly.com/integrityrecordsadmin/30min"
         target="_blank"
         rel="noopener noreferrer"
