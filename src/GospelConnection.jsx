@@ -324,12 +324,7 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
           posts.map((post) => <PostCard key={post.id} post={post} currentUser={currentUser} />)
         )}
       </>
-    )}
-  </div>
-  );
-
-
-
+    
  
 
 
