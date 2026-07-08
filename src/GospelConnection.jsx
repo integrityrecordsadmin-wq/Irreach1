@@ -327,44 +327,8 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
     )}
   </div>
   );
-}
-    
-          
-          
-          
 
-          
-        
-        
-      
-      
-        
-      
-        
-        
-          
-      
-      
-    
-    
-        
-
-
-        
-        
-          
-
-          
-          
-          
-          
-          
-          
-        
-
-          
-        
-      >
+>
         Book a Free 1-on-1 Session with Chris
       </a>
     )}
