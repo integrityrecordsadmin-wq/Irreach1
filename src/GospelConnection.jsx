@@ -328,25 +328,12 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
   </div>
   );
 
->
-        Book a Free 1-on-1 Session with Chris
-      </a>
-    )}
 
-      {!isSubscriber ? (
-        <LockedGate />
-      ) : (
-        <>
-          <Composer currentUser={currentUser} onPosted={() => {}} />
-          {posts.length === 0 ? (
-            <p style={{ textAlign: "center", color: "#999", fontSize: 14, marginTop: 40 }}>
-              No posts yet — be the first to share something.
-            </p>
-          ) : (
-            posts.map((post) => <PostCard key={post.id} post={post} currentUser={currentUser} />)
-          )}
-        </>
-      )}
-    </div>
-  );
-}
+
+ 
+
+
+          
+
+
+
