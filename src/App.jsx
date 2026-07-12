@@ -577,7 +577,7 @@ function Shop({ addToCart, cart, library }) {
 
       <div className="grid md:grid-cols-2 gap-4">
         {items.map((item) => {
-          const owned = item.type === "ebook" ? (library.ebook || library.subscription) : library.planner;
+          const owned = item.type === "ebook" ? (library.subscription || library.ebooks?.includes(item.id)) : library.planner;
           const inCart = cart.some((c) => c.id === item.id);
           return (
             <div key={item.id} className="rounded-lg p-5 flex flex-col" style={{ background: COLORS.panel, border: `1px solid ${COLORS.line}` }}>
