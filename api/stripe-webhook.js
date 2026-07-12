@@ -1,3 +1,5 @@
+
+
 import Stripe from "stripe";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
@@ -24,9 +26,22 @@ function buffer(readable) {
   });
 }
 
+// Maps each ebook product id to its actual PDF filename in /public
+const EBOOK_FILES = {
+  "ebook-contract": "integrity-records-music-contract-guide.pdf",
+  "ebook-kingdoms": "kingdoms-for-a-song.pdf",
+  "ebook-wilderness": "the-wilderness-deal.pdf",
+  "ebook-bowing": "bowing-for-the-beat.pdf",
+  "ebook-glory": "causing-the-glory-to-fall.pdf",
+  "ebook-undivided": "undivided.pdf",
+  "ebook-asyourself": "as-yourself.pdf",
+  "ebook-bondofpeace": "bond-of-peace.pdf",
+  "ebook-overcomers": "the-overcomers.pdf",
+};
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).send("Method not allowed");
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   let event;
@@ -46,19 +61,42 @@ export default async function handler(req, res) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const customerEmail = session.customer_details?.email || null;
-    const token = crypto.randomBytes(24).toString("hex");
 
-    await db.collection("downloadTokens").doc(token).set({
-      productId: "ebook-contract",
-      fileName: "integrity-records-music-contract-guide.pdf",
-      email: customerEmail,
-      used: false,
-      createdAt: new Date().toISOString(),
-      stripeSessionId: session.id,
-    });
+    // Two possible sources for which item(s) were purchased:
+    // 1. Cart checkout (create-checkout-session.js) sets metadata.itemIds as a JSON array.
+    // 2. A one-click Stripe Payment Link sets metadata.itemId as a single string.
+    let itemIds = [];
+    try {
+      if (session.metadata?.itemIds) {
+        itemIds = JSON.parse(session.metadata.itemIds);
+      } else if (session.metadata?.itemId) {
+        itemIds = [session.metadata.itemId];
+      }
+    } catch {
+      itemIds = [];
+    }
 
-    console.log(`Created download token for session ${session.id}`);
+    // Fallback: if no metadata present (e.g. older sessions/links), default to the
+    // original contract guide so existing behavior doesn't silently break.
+    if (itemIds.length === 0) {
+      itemIds = ["ebook-contract"];
+    }
+
+    for (const id of itemIds) {
+      const fileName = EBOOK_FILES[id];
+      if (!fileName) continue; // not an ebook (e.g. ringtone, planner, subscription) — skip
+
+      const token = crypto.randomBytes(24).toString("hex");
+      await db.collection("downloadTokens").doc(token).set({
+        productId: id,
+        fileName,
+        email: customerEmail,
+        used: false,
+        createdAt: new Date().toISOString(),
+        stripeSessionId: session.id,
+      });
+    }
   }
 
-  res.status(200).json({ received: true });
+  return res.status(200).json({ received: true });
 }
