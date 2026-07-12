@@ -1017,7 +1017,7 @@ function Header({ page, go, cartCount }) {
       )}
     </header>
   );
-}
+} const owned = item.type === "ebook" ? (library.subscription || library.ebooks?.includes(item.id)) : library.planner;
 
 /* =========================================================================
    ROOT APP
@@ -1041,14 +1041,13 @@ export default function App() {
   const removeFromCart = (id) => setCart((prev) => prev.filter((c) => c.id !== id));
 
   const completeCheckout = async () => {
-    const next = { ...library, ringtones: [...library.ringtones] };
+    const next = { ...library, ringtones: [...library.ringtones], ebooks: [...(library.ebooks || [])] };
     cart.forEach((item) => {
       if (item.type === "ringtone") next.ringtones.push(item.id);
-      if (item.type === "ebook") next.ebook = true;
+      if (item.type === "ebook" && !next.ebooks.includes(item.id)) next.ebooks.push(item.id);
       if (item.type === "planner") next.planner = true;
       if (item.type === "subscription") {
         next.subscription = { label: PLANS[item.meta].label };
-        next.ebook = true;
       }
     });
     setLibrary(next);
