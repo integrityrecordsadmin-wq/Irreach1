@@ -121,8 +121,8 @@ const PLANNER = {downloadUrl: "/integrity-records-daily-planner.pdf",
 };
 
 const PLANS = {
-  monthly: { id: "sub-monthly", label: "Monthly", price: 4.99, cadence: "/month" },
-  yearly: { id: "sub-yearly", label: "Yearly", price: 49.99, cadence: "/year" },
+  monthly: { id: "sub-monthly", label: "Monthly", price: 9.99, cadence: "/month" },
+  yearly: { id: "sub-yearly", label: "Yearly", price: 99.99, cadence: "/year" },
 };
 
 const PERKS = [
