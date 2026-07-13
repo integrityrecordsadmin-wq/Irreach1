@@ -1017,7 +1017,7 @@ function Header({ page, go, cartCount }) {
       )}
     </header>
   );
-} const owned = item.type === "ebook" ? (library.subscription || library.ebooks?.includes(item.id)) : library.planner;
+}
 
 /* =========================================================================
    ROOT APP
