@@ -538,7 +538,7 @@ function Subscription({ addToCart, library }) {
           <span className="ir-display text-4xl" style={{ color: COLORS.parchment }}>{money(PLANS[plan].price)}</span>
           <span className="ir-body text-sm" style={{ color: "#9aa0b4" }}>{PLANS[plan].cadence}</span>
         </div>
-const items = [EBOOK, PLANNER, EBOOK_KINGDOMS, EBOOK_WILDERNESS, EBOOK_BOWING, EBOOK_GLORY, EBOOK_UNDIVIDED, EBOOK_ASYOURSELF, EBOOK_BONDOFPEACE, EBOOK_OVERCOMERS];
+
         <div className="mt-6 space-y-2">
           {PERKS.map((perk) => (
             <div key={perk} className="flex items-start gap-2">
@@ -567,7 +567,7 @@ const items = [EBOOK, PLANNER, EBOOK_KINGDOMS, EBOOK_WILDERNESS, EBOOK_BOWING, E
 }
 
 function Shop({ addToCart, cart, library }) {
-  const items = [EBOOK, PLANNER];
+const items = [EBOOK, PLANNER, EBOOK_KINGDOMS, EBOOK_WILDERNESS, EBOOK_BOWING, EBOOK_GLORY, EBOOK_UNDIVIDED, EBOOK_ASYOURSELF, EBOOK_BONDOFPEACE, EBOOK_OVERCOMERS];
   return (
     <div className="ir-fade-in space-y-6 pb-10">
       <div>
