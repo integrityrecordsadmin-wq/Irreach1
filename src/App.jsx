@@ -9,7 +9,7 @@ import GospelConnection from "./GospelConnection";
 import GospelConnectionDoor from "./GospelConnectionDoor";
 import { auth, db } from "./firebaseConfig";
 import {
-  onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut,
+  subtitle="One more step — create your account (or log in) to complete this subscription."
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
