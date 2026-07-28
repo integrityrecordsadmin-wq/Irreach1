@@ -1145,7 +1145,7 @@ function CheckoutModal({ cart, user, onClose, onComplete }) {
         {step === "account" && (
           <AuthForm
             onAuthed={() => setStep("payment")}
-            subtitle="Create a free account (or log in) so your purchase is saved to your library."
+            subtitle="One more step — create your account (or log in) to complete this subscription."
           />
         )}
 
