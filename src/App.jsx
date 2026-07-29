@@ -755,9 +755,14 @@ const items = [EBOOK, PLANNER, EBOOK_KINGDOMS, EBOOK_WILDERNESS, EBOOK_BOWING, E
               <div className="mt-5 flex items-center justify-between">
                 <span className="ir-mono text-lg" style={{ color: COLORS.brass }}>{money(item.price)}</span>
                 {owned ? (
-                  <span className="ir-mono text-xs px-3 py-2 rounded-md flex items-center gap-1" style={{ color: "#a9e0bb", border: `1px solid #2f4a37` }}>
-                    <Check size={14} /> Owned
-                  </span>
+                  <a
+                    href={item.downloadUrl}
+                    download
+                    className="ir-mono text-xs px-3 py-2 rounded-md flex items-center gap-1"
+                    style={{ color: COLORS.brass, border: `1px solid ${COLORS.line}` }}
+                  >
+                    <Download size={14} /> Download
+                  </a>
                 ) : (
                   <Button
                     variant={inCart ? "ghost" : "primary"}
