@@ -204,7 +204,34 @@ async function loadJournal(key) {
 async function saveJournalEntry(key, data) {
   try { await window.storage.set(`ir:journal:${key}`, JSON.stringify(data), false); } catch {}
 }
+function SupportUs() {
+  return (
+    <div className="ir-fade-in space-y-6 pb-10 max-w-xl">
+      <div>
+        <h2 className="ir-display text-3xl" style={{ color: COLORS.parchment }}>Support Us</h2>
+        <p className="ir-body text-sm mt-1" style={{ color: "#9aa0b4" }}>
+          Every gift helps keep Integrity Records running — fair pricing, no fine print, music made for God.
+        </p>
+      </div>
 
+      <div className="rounded-lg p-6 text-center" style={{ background: COLORS.panel, border: `1px solid ${COLORS.line}` }}>
+        <Heart size={28} className="mx-auto mb-3" style={{ color: COLORS.brass }} />
+        <p className="ir-body text-sm mb-5" style={{ color: COLORS.offwhite }}>
+          If this label's music or message has meant something to you, consider leaving a gift.
+        </p>
+        <a
+          href="https://cash.app/$ChrisJohnson955"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <Button className="w-full md:w-auto">
+            <Heart size={16} /> Donate via Cash App
+          </Button>
+        </a>
+      </div>
+    </div>
+  );
+}
 /* =========================================================================
    GLOBAL STYLE / FONTS
    ========================================================================= */
