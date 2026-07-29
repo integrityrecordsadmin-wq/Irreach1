@@ -1229,7 +1229,7 @@ function Header({ page, go, cartCount, guideStep, onCartIconClick, user, onLogou
     { id: "shop", label: "Shop" },
     { id: "journal", label: "Daily Journey" },
     { id: "about", label: "About" },
-  ];
+  ];{ id: "support", label: "Support Us" },
   return (
     <header className="sticky top-0 z-40" style={{ background: COLORS.ink, borderBottom: `1px solid ${COLORS.line}` }}>
       <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
@@ -1412,6 +1412,8 @@ export default function App() {
         )}
         {page === "about" && <About />}
         {page === "gospel-connection" && (
+      {page === "about" && <About />}
+      {page === "support" && <SupportUs />}
           <GospelConnection
             isSubscriber={!!library.subscription}
             currentUser={{ id: user?.uid || "guest", name: user?.email || "Member", avatarHue: "#7A2E2E" }}
