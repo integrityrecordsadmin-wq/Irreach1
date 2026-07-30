@@ -934,6 +934,12 @@ function About() {
         <h2 className="ir-display text-3xl" style={{ color: COLORS.parchment }}>About Integrity Records</h2>
         <p className="ir-body text-sm mt-1" style={{ color: "#9aa0b4" }}>Who we are, what we sell, and how to reach us.</p>
       </div>
+      {/* Paused while enrolled in KDP Select — re-enable once enrollment period ends
+<section className="rounded-lg p-5" style={{ background: COLORS.panel, border: `1px solid ${COLORS.line}` }}>
+  <h3 className="ir-display text-lg mb-2" style={{ color: COLORS.parchment }}>My Story — Ascending by the Spirit</h3>
+  ...
+</section>
+*/}
 <section className="rounded-lg p-5" style={{ background: COLORS.panel, border: `1px solid ${COLORS.line}` }}>
   <h3 className="ir-display text-lg mb-2" style={{ color: COLORS.parchment }}>My Story — Ascending by the Spirit</h3>
   <p className="ir-body text-sm leading-relaxed mb-4" style={{ color: COLORS.offwhite }}>
