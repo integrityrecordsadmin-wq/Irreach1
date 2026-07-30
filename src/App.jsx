@@ -1220,17 +1220,16 @@ function CheckoutModal({ cart, user, onClose, onComplete }) {
 /* =========================================================================
    HEADER / NAV
    ========================================================================= */
-function Header({ page, go, cartCount, guideStep, onCartIconClick, user, onLogout }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const tabs = [
+
+const tabs = [
     { id: "home", label: "Home" },
     { id: "ringtones", label: "Ringtones" },
     { id: "subscription", label: "Subscription" },
     { id: "shop", label: "Shop" },
     { id: "journal", label: "Daily Journey" },
     { id: "about", label: "About" },
-  ];{ id: "support", label: "Support Us" },
-
+    { id: "support", label: "Support Us" },
+  ];
   return (
     <header className="sticky top-0 z-40" style={{ background: COLORS.ink, borderBottom: `1px solid ${COLORS.line}` }}>
       <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
