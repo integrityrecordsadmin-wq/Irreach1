@@ -1220,7 +1220,11 @@ function CheckoutModal({ cart, user, onClose, onComplete }) {
 /* =========================================================================
    HEADER / NAV
    ========================================================================= */
-
+/* =========================================================================
+   HEADER / NAV
+   ========================================================================= */
+function Header({ page, go, cartCount, guideStep, onCartIconClick, user, onLogout }) {
+  const [menuOpen, setMenuOpen] = useState(false);
 const tabs = [
     { id: "home", label: "Home" },
     { id: "ringtones", label: "Ringtones" },
@@ -1411,10 +1415,9 @@ export default function App() {
           <CartPage cart={cart} removeFromCart={removeFromCart} onCheckoutClick={handleCheckoutClick} guideStep={guideStep} />
         )}
         {page === "about" && <About />}
+        {page === "support" && <SupportUs />}
         {page === "gospel-connection" && (
-      {page === "about" && <About />}
-      {page === "support" && <SupportUs />}
-          <GospelConnection
+         <GospelConnection
             isSubscriber={!!library.subscription}
             currentUser={{ id: user?.uid || "guest", name: user?.email || "Member", avatarHue: "#7A2E2E" }}
           />
