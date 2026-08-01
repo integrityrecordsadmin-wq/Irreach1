@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Free Guide — What You Need to Understand Before Signing a Music Contract | Integrity Records</title>
+<meta name="description" content="Get a free preview of the Complete Guide to understanding music contracts, from Integrity Records." />
+<style>
+  :root {
+    --navy: #0B1F3A;
+    --gold: #C6A15B;
+    --cream: #FDF8EF;
+    --text: #2B2320;
+    --subtext: #6B7280;
+    --border: #E4E2D9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .card {
+    background: var(--cream);
+    border-radius: 20px;
+    padding: 36px 28px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    text-align: center;
+  }
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px;
+    color: var(--navy);
+    margin: 0 0 12px;
+    line-height: 1.3;
+  }
+  .sub {
+    color: var(--subtext);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 28px;
+  }
+  .points {
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin: 0 0 24px;
+  }
+  .points p {
+    font-size: 13px;
+    color: var(--text);
+    margin: 6px 0;
+    line-height: 1.5;
+  }
+  form { text-align: left; }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 6px;
+  }
+  input {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 15px;
+    background: #fff;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+  button:active:not(:disabled) { transform: scale(0.98); }
+  .error {
+    color: #8A2A2A;
+    font-size: 13px;
+    margin: -6px 0 14px;
+    display: none;
+  }
+  .success {
+    display: none;
+  }
+  .success.shown { display: block; }
+  form.hidden { display: none; }
+  .success h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    color: var(--navy);
+    margin: 0 0 10px;
+  }
+  .success p { color: var(--subtext); font-size: 14px; margin: 0 0 20px; }
+  .download-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--navy);
+    color: #F5F5F0;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .fine {
+    font-size: 11px;
+    color: #9CA3AF;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <p class="kicker">Integrity Records</p>
+    <h1>What You Need to Understand Before Signing a Music Contract</h1>
+    <p class="sub">Get a free preview of the Complete Guide — real, worked examples included.</p>
+
+    <div class="points">
+      <p>✓ Master rights vs. publishing rights — explained</p>
+      <p>✓ Royalty splits: what's fair, what's not</p>
+      <p>✓ Why this guide exists (and how to use it)</p>
+    </div>
+
+    <form id="signupForm">
+      <label for="email">Email address</label>
+      <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+      <p class="error" id="errorMsg"></p>
+      <button id="submitBtn" type="submit">Get My Free Guide</button>
+    </form>
+
+    <div class="success" id="successBlock">
+      <h2>You're in! 🎉</h2>
+      <p>Tap below to get your free preview guide.</p>
+      <a class="download-btn" id="downloadLink" href="/music-contract-guide-free-preview.pdf" download>
+        Download Your Free Guide
+      </a>
+    </div>
+
+    <p class="fine">We'll never spam you. Unsubscribe anytime.</p>
+  </div>
+
+<script>
+document.getElementById('signupForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const email = document.getElementById('email').value.trim();
+  const errorMsg = document.getElementById('errorMsg');
+  const btn = document.getElementById('submitBtn');
+
+  errorMsg.style.display = 'none';
+
+  btn.disabled = true;
+  btn.textContent = 'One sec…';
+
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'free-guide-page' }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      errorMsg.textContent = data.error || 'Something went wrong. Please try again.';
+      errorMsg.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Get My Free Guide';
+      return;
+    }
+
+    document.getElementById('signupForm').classList.add('hidden');
+    document.getElementById('successBlock').classList.add('shown');
+  } catch (err) {
+    errorMsg.textContent = 'Network error — please try again.';
+    errorMsg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Get My Free Guide';
+  }
+});
+</script>
+</body>
+</html>
