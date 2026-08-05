@@ -603,12 +603,12 @@ function Ringtones({ player, cart, addToCart, library }) {
       )}
 
       <div className="rounded-md p-4 text-sm ir-body flex items-start gap-3" style={{ background: "#1c2a20", border: `1px solid #2f4a37`, color: "#c9e0d0" }}>
-        <Star size={16} className="shrink-0 mt-0.5" style={{ color: COLORS.brass }} />
-        <span>
-          Fan favorites, marked below: the White female vocalist take is the top pick, with both
-          Black male vocalist takes as the runner-up recommendation.
-        </span>
-      </div>
+  <Star size={16} className="shrink-0 mt-0.5" style={{ color: COLORS.brass }} />
+  <span>
+    Fan favorites, marked below: the White female vocalist take is the top pick, with both
+    Black male vocalist takes as the runner-up recommendation.
+  </span>
+</div>
 
       <div className="space-y-2">
         {RINGTONES.map((rt, i) => {
