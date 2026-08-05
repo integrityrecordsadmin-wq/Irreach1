@@ -254,14 +254,12 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-  const q = query(collection(db, "gospelPosts"), orderBy("createdAt", "desc"));
-  const unsub = onSnapshot(q, (snap) => {
-    setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-  });
-  return unsub;
-}, []);
+    const q = query(collection(db, "gospelPosts"), orderBy("createdAt", "desc"));
+    const unsub = onSnapshot(q, (snap) => {
+      setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
     return unsub;
-  }, [isSubscriber]);
+  }, []);
 
   return (
     <div style={{ maxWidth: 560, margin: "0 auto", padding: "24px 16px 60px" }}>
@@ -272,59 +270,58 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
         <p style={{ color: "#8A6D2F", fontSize: 13.5, fontStyle: "italic", margin: 0 }}>
           "Let us consider how we may spur one another on toward love and good deeds." — Hebrews 10:24
         </p>
-      </div>{isSubscriber && ( 
-      <div
-        style={{
-          marginBottom: 28,
-          borderRadius: 12,
-          background: `${GOLD}15`,
-          border: `1px solid ${GOLD}55`,
-          padding: "28px 20px",
-          textAlign: "center",
-        }}
-      >
-        <div style={{ fontSize: 14, color: NAVY, fontWeight: 700, marginBottom: 4 }}>
-          🎥 A Personal Welcome from Chris
+      </div>
+      {isSubscriber && (
+        <div
+          style={{
+            marginBottom: 28,
+            borderRadius: 12,
+            background: `${GOLD}15`,
+            border: `1px solid ${GOLD}55`,
+            padding: "28px 20px",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: 14, color: NAVY, fontWeight: 700, marginBottom: 4 }}>
+            🎥 A Personal Welcome from Chris
+          </div>
+          <div style={{ fontSize: 13, color: "#8A6D2F" }}>
+            Coming soon
+          </div>
         </div>
-        <div style={{ fontSize: 13, color: "#8A6D2F" }}>
-          Coming soon
-        </div>
-      </div> 
-    )}
-    {isSubscriber && (  
-        
-    <a
-        href="https://calendly.com/integrityrecordsadmin/30min"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          display: "block",
-          textAlign: "center",
-          background: GOLD,
-          color: NAVY,
-          fontWeight: 700,
-          fontSize: 15,
-          padding: "14px 20px",
-          borderRadius: 999,
-          textDecoration: "none",
-          marginBottom: 28,
-        }}
-      >
-        Book a Free 1-on-1 Session with Chris
-      </a>
-    <Composer currentUser={currentUser} onPosted={() => {}} />
-{posts.length === 0 ? (
-  <p style={{ textAlign: "center", color: "#999", fontSize: 14, marginTop: 40 }}>
-    No posts yet — be the first to share something.
-  </p>
-) : (
-  posts.map((post) => <PostCard key={post.id} post={post} currentUser={currentUser} />)
-)}
+      )}
+      {isSubscriber && (
+        <a
+          href="https://calendly.com/integrityrecordsadmin/30min"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "block",
+            textAlign: "center",
+            background: GOLD,
+            color: NAVY,
+            fontWeight: 700,
+            fontSize: 15,
+            padding: "14px 20px",
+            borderRadius: 999,
+            textDecoration: "none",
+            marginBottom: 28,
+          }}
+        >
+          Book a Free 1-on-1 Session with Chris
+        </a>
+      )}
+      <Composer currentUser={currentUser} onPosted={() => {}} />
+      {posts.length === 0 ? (
+        <p style={{ textAlign: "center", color: "#999", fontSize: 14, marginTop: 40 }}>
+          No posts yet — be the first to share something.
+        </p>
+      ) : (
+        posts.map((post) => <PostCard key={post.id} post={post} currentUser={currentUser} />)
+      )}
     </div>
   );
 }
-    
- 
 
 
           
