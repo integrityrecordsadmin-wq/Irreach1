@@ -3,8 +3,9 @@ import React, { useState } from "react";
 /* =====================================================================
    GOSPEL CONNECTION — DOOR ENTRANCE
    A themed entry point: an arched wooden door with warm light spilling
-   from beneath it. Clicking it calls onEnter() to route into the
-   Gospel Connection feed.
+   from beneath it. Clicking it plays a Stargate-style "wormhole" event
+   horizon transition, then calls onEnter() to route into the Gospel
+   Connection feed.
 
    Usage:
      <GospelConnectionDoor onEnter={() => setPage("gospel-connection")} />
@@ -17,6 +18,16 @@ const GOLD_LIGHT = "#E8D5A8";
 
 export default function GospelConnectionDoor({ onEnter }) {
   const [hover, setHover] = useState(false);
+  const [entering, setEntering] = useState(false);
+
+  const handleEnter = () => {
+    if (entering) return;
+    setEntering(true);
+    // Let the wormhole animation play, then actually navigate.
+    setTimeout(() => {
+      onEnter();
+    }, 1300);
+  };
 
   return (
     <div
@@ -32,6 +43,66 @@ export default function GospelConnectionDoor({ onEnter }) {
         position: "relative",
       }}
     >
+      <style>{`
+        @keyframes wormholeRing {
+          0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+          8% { opacity: 1; }
+          100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+        @keyframes wormholeFlash {
+          0% { opacity: 0; }
+          55% { opacity: 0; }
+          75% { opacity: 1; }
+          100% { opacity: 1; }
+        }
+        @keyframes wormholeShimmer {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+      `}</style>
+
+      {entering && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            pointerEvents: "none",
+            overflow: "hidden",
+            background: "#000",
+            animation: "wormholeFlash 1.3s ease forwards",
+          }}
+        >
+          {[0, 0.12, 0.24, 0.36, 0.48].map((delay, i) => (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                border: `2px solid ${i % 2 === 0 ? "#8FD6FF" : GOLD_LIGHT}`,
+                boxShadow: `0 0 40px 10px ${i % 2 === 0 ? "#8FD6FF" : GOLD_LIGHT}`,
+                animation: `wormholeRing 1.1s ease-out ${delay}s forwards`,
+              }}
+            />
+          ))}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: `radial-gradient(circle at 50% 50%, #eaf6ff 0%, #8FD6FF 20%, ${GOLD_LIGHT} 45%, ${NAVY_DEEP} 75%)`,
+              backgroundSize: "200% 200%",
+              opacity: 0,
+              animation: "wormholeShimmer 1.3s linear infinite, wormholeFlash 1.3s ease forwards",
+              mixBlendMode: "screen",
+            }}
+          />
+        </div>
+      )}
+
       <p
         style={{
           fontFamily: "Georgia, serif",
@@ -47,14 +118,15 @@ export default function GospelConnectionDoor({ onEnter }) {
       </p>
 
       <button
-        onClick={onEnter}
+        onClick={handleEnter}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         aria-label="Enter Gospel Connection"
+        disabled={entering}
         style={{
           background: "none",
           border: "none",
-          cursor: "pointer",
+          cursor: entering ? "default" : "pointer",
           padding: 0,
           display: "flex",
           flexDirection: "column",
@@ -213,7 +285,7 @@ export default function GospelConnectionDoor({ onEnter }) {
             letterSpacing: 0.5,
           }}
         >
-          Enter Gospel Connection
+          {entering ? "Stepping through…" : "Enter Gospel Connection"}
         </span>
         <span
           style={{
@@ -222,7 +294,7 @@ export default function GospelConnectionDoor({ onEnter }) {
             color: "#8FA0BE",
           }}
         >
-          <span>{hover ? "Tap to step inside" : "A space for the community to connect"}</span>
+          {hover && !entering ? "Tap to step inside" : !entering ? "A space for the community to connect" : ""}
         </span>
       </button>
     </div>
