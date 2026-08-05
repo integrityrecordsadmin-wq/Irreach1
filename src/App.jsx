@@ -168,9 +168,15 @@ const DEFAULT_LIBRARY = { ringtones: [], ebooks: [], planner: false, subscriptio
 /* =========================================================================
    FIRESTORE LIBRARY HELPERS (per signed-in user, replaces window.storage)
    ========================================================================= */
-async function loadLibrary(uid) {
-  if (!uid) return { ...DEFAULT_LIBRARY };
+async function captureGospelLead(user) {
+  if (!user?.uid) return;
   try {
+    await setDoc(doc(db, "gospel_leads", user.uid), {
+      email: user.email,
+      capturedAt: new Date().toISOString(),
+    }, { merge: true });
+  } catch {}
+}
     const snap = await getDoc(doc(db, "users", uid));
     if (snap.exists()) {
       const data = snap.data();
@@ -1354,9 +1360,13 @@ export default function App() {
   };
 
   const handleEnterGospel = () => {
-    if (user) setPage("gospel-connection");
-    else setGospelGateOpen(true);
-  };
+  if (user) {
+    setPage("gospel-connection");
+    captureGospelLead(user);
+  } else {
+    setGospelGateOpen(true);
+  }
+};
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -1437,14 +1447,15 @@ export default function App() {
       )}
 
       {gospelGateOpen && (
-        <AuthGateModal
-          onClose={() => setGospelGateOpen(false)}
-          onAuthed={() => {
-            setGospelGateOpen(false);
-            setPage("gospel-connection");
-          }}
-        />
-      )}
+  <AuthGateModal
+    onClose={() => setGospelGateOpen(false)}
+    onAuthed={(authedUser) => {
+      setGospelGateOpen(false);
+      setPage("gospel-connection");
+      captureGospelLead(authedUser);
+    }}
+  />
+)}
     </div>
   );
 }
