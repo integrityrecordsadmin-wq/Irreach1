@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+8import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Music, Play, Pause, ShoppingCart, BookOpen, CalendarDays, Heart,
   Share2, Check, X, Lock, CreditCard, Sparkles, Download, Star,
@@ -53,14 +53,14 @@ function toDirectLink(url) {
 const SONG = "Truly Amazing";
 
 const TRACKS = [
-  { take: "Take 4",   artist: "", photoUrl: "", gender: "Male",   culture: "White",    favorite: false },
-  { take: "Take 6",   artist: "", photoUrl: "", gender: "Male",   culture: "White",    favorite: false },
-  { take: "Take 8",   artist: "", photoUrl: "", gender: "Male",   culture: "Hispanic", favorite: false },
-  { take: "Take 9",   artist: "", photoUrl: "", gender: "Female", culture: "White",    favorite: true },
-  { take: "Take 10",  artist: "", photoUrl: "", gender: "Male",   culture: "Black",    favorite: true },
-  { take: "Take 11",  artist: "", photoUrl: "", gender: "Male",   culture: "Black",    favorite: true },
-  { take: "Take 13",  artist: "", photoUrl: "", gender: "Male",   culture: "White",    favorite: false },
-  { take: "Original", artist: "", photoUrl: "", gender: "Female", culture: "White",    favorite: false },
+  { take: "Take 4",   artist: "", photoUrl: "", gender: "Male",   favorite: false },
+  { take: "Take 6",   artist: "", photoUrl: "", gender: "Male",   favorite: false },
+  { take: "Take 8",   artist: "", photoUrl: "", gender: "Male",   favorite: false },
+  { take: "Take 9",   artist: "", photoUrl: "", gender: "Female", favorite: true },
+  { take: "Take 10",  artist: "", photoUrl: "", gender: "Male",   favorite: true },
+  { take: "Take 11",  artist: "", photoUrl: "", gender: "Male",   favorite: true },
+  { take: "Take 13",  artist: "", photoUrl: "", gender: "Male",   favorite: false },
+  { take: "Original", artist: "", photoUrl: "", gender: "Female", favorite: false },
 ];
 
 const AVATAR_HUES = ["#C9A24B", "#7A2E2E", "#3B6E71", "#5A5B8C", "#9A6B3F", "#4C7A5D", "#8C4B6B", "#6B7A99"];
