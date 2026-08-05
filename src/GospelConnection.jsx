@@ -254,11 +254,12 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    if (!isSubscriber) return;
-    const q = query(collection(db, "gospelPosts"), orderBy("createdAt", "desc"));
-    const unsub = onSnapshot(q, (snap) => {
-      setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
+  const q = query(collection(db, "gospelPosts"), orderBy("createdAt", "desc"));
+  const unsub = onSnapshot(q, (snap) => {
+    setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+  });
+  return unsub;
+}, []);
     return unsub;
   }, [isSubscriber]);
 
@@ -311,20 +312,14 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
       >
         Book a Free 1-on-1 Session with Chris
       </a>
-    )}{!isSubscriber ? (
-      <LockedGate />
-    ) : (
-      <>
-        <Composer currentUser={currentUser} onPosted={() => {}} />
-        {posts.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#999", fontSize: 14, marginTop: 40 }}>
-            No posts yet — be the first to share something.
-          </p>
-        ) : (
-          posts.map((post) => <PostCard key={post.id} post={post} currentUser={currentUser} />)
-        )}
-      </>
-      )}
+    <Composer currentUser={currentUser} onPosted={() => {}} />
+{posts.length === 0 ? (
+  <p style={{ textAlign: "center", color: "#999", fontSize: 14, marginTop: 40 }}>
+    No posts yet — be the first to share something.
+  </p>
+) : (
+  posts.map((post) => <PostCard key={post.id} post={post} currentUser={currentUser} />)
+)}
     </div>
   );
 }
