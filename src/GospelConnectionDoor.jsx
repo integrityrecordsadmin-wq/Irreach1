@@ -222,7 +222,7 @@ export default function GospelConnectionDoor({ onEnter }) {
             color: "#8FA0BE",
           }}
         >
-          {hover ? "Tap to step inside" : "A space for subscribers to connect"}
+          <span>{hover ? "Tap to step inside" : "A space for the community to connect"}</span>
         </span>
       </button>
     </div>
