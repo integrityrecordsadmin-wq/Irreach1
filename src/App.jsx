@@ -599,7 +599,7 @@ function Ringtones({ player, cart, addToCart, library }) {
             each artist's name (and a real photo, if you have one) and I'll swap it in.
           </span>
         </div>
-    
+    )}
 
       <div className="space-y-2">
         {RINGTONES.map((rt, i) => {
