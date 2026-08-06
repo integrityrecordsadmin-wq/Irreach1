@@ -5,6 +5,9 @@ import {
   ShieldCheck, PenLine, Sunrise, Quote, ChevronRight, Menu, Trash2,
   Copy, Link as LinkIcon, User, LogOut, Mail,
 } from "lucide-react";
+import {
+  BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation,
+} from "react-router-dom";
 import GospelConnection from "./GospelConnection";
 import GospelConnectionDoor from "./GospelConnectionDoor";
 import { auth, db } from "./firebaseConfig";
@@ -14,12 +17,33 @@ import {
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 /* =========================================================================
+   ROUTES
+   -------------------------------------------------------------------------
+   Maps the old internal "page id" strings (used everywhere else in this
+   file) to real URL paths, so refreshing or sharing a link actually works.
+   Nothing else in the file needed to change its own logic — Header still
+   receives a `page` id and a `go(id)` function with the exact same shape
+   as before, they just now come from the URL instead of useState.
+   ========================================================================= */
+const ROUTE_PATHS = {
+  home: "/",
+  ringtones: "/ringtones",
+  subscription: "/subscription",
+  shop: "/shop",
+  journal: "/journal",
+  cart: "/cart",
+  about: "/about",
+  support: "/support",
+  "gospel-connection": "/gospel-connection",
+};
+
+function pageIdFromPath(pathname) {
+  const entry = Object.entries(ROUTE_PATHS).find(([, path]) => path === pathname);
+  return entry ? entry[0] : "home";
+}
+
+/* =========================================================================
    AUDIO SOURCE CONFIG
-   -------------------------------------------------------------------------0
-   These point to real files in /public/audio, served normally by whatever
-   host this app is deployed to (Vercel, Netlify, etc). This works reliably
-   once deployed -- unlike a chat preview sandbox, real hosting serves and
-   plays static files with no restrictions.
    ========================================================================= */
 const AUDIO_FILES = [
   "/audio/take4.mp3",
@@ -40,16 +64,6 @@ function toDirectLink(url) {
   return url;
 }
 
-/* =========================================================================
-   CATALOG DATA
-   -------------------------------------------------------------------------
-   Each recording is a different artist's take on "Truly Amazing." `artist`
-   and `photoUrl` are still blank because no name or real photo has been
-   provided yet — a stock photo of a stranger would misrepresent who
-   actually sang it, so avatars below are generic (icon + color) and
-   labeled with the gender/culture info given, rather than a fabricated
-   photo. Swap in `artist` and `photoUrl` any time you have real ones.
-   ========================================================================= */
 const SONG = "Truly Amazing";
 
 const TRACKS = [
@@ -116,7 +130,6 @@ const EBOOK_OVERCOMERS = { downloadUrl: "/the-overcomers.pdf", id: "ebook-overco
   title: "The Overcomers", blurb: "What the last-days church is called to become.", price: 10.99,
   buyUrl: "https://buy.stripe.com/test_3cI00i1YG9cu76F5b42go00" };
 
-
 const PLANNER = {downloadUrl: "/integrity-records-daily-planner.pdf",
   id: "planner-daily",
   type: "planner",
@@ -165,9 +178,6 @@ function money(n) {
 
 const DEFAULT_LIBRARY = { ringtones: [], ebooks: [], planner: false, subscription: null };
 
-/* =========================================================================
-   FIRESTORE LIBRARY HELPERS (per signed-in user, replaces window.storage)
-   ========================================================================= */
 async function loadLibrary(uid) {
   if (!uid) return { ...DEFAULT_LIBRARY };
   try {
@@ -213,6 +223,19 @@ async function loadJournal(key) {
 async function saveJournalEntry(key, data) {
   try { await window.storage.set(`ir:journal:${key}`, JSON.stringify(data), false); } catch {}
 }
+
+const COLORS = {
+  ink: "#14161F",
+  panel: "#1D2130",
+  panelLight: "#262B3D",
+  parchment: "#F1E9D8",
+  offwhite: "#EDE7DA",
+  brass: "#C9A24B",
+  brassDim: "#8f7233",
+  oxblood: "#7A2E2E",
+  line: "#33384B",
+};
+
 function SupportUs() {
   return (
     <div className="ir-fade-in space-y-6 pb-10 max-w-xl">
@@ -241,20 +264,6 @@ function SupportUs() {
     </div>
   );
 }
-/* =========================================================================
-   GLOBAL STYLE / FONTS
-   ========================================================================= */
-const COLORS = {
-  ink: "#14161F",
-  panel: "#1D2130",
-  panelLight: "#262B3D",
-  parchment: "#F1E9D8",
-  offwhite: "#EDE7DA",
-  brass: "#C9A24B",
-  brassDim: "#8f7233",
-  oxblood: "#7A2E2E",
-  line: "#33384B",
-};
 
 function GlobalStyle() {
   return (
@@ -277,10 +286,6 @@ function GlobalStyle() {
   );
 }
 
-/* =========================================================================
-   GUIDED POINTER — a small floating tooltip + bouncing arrow, used to
-   walk a first-time buyer from Subscribe -> Cart -> Checkout.
-   ========================================================================= */
 function GuidePointer({ text, position = "bottom" }) {
   return (
     <div
@@ -313,9 +318,6 @@ function GuidePointer({ text, position = "bottom" }) {
   );
 }
 
-/* =========================================================================
-   SMALL SHARED COMPONENTS
-   ========================================================================= */
 function Seal({ size = 64 }) {
   return (
     <div
@@ -365,13 +367,8 @@ function Button({ children, onClick, variant = "primary", className = "", disabl
   );
 }
 
-/* =========================================================================
-   AUTH SCREEN — email/password sign up or log in, embeddable inline
-   (used both as a standalone gate for Gospel Connection and as the
-   "Account" step inside checkout).
-   ========================================================================= */
 function AuthForm({ onAuthed, title, subtitle }) {
-  const [mode, setMode] = useState("signup"); // "signup" | "login"
+  const [mode, setMode] = useState("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -449,7 +446,6 @@ function AuthForm({ onAuthed, title, subtitle }) {
   );
 }
 
-/* Standalone modal used to gate the Gospel Connection door */
 function AuthGateModal({ onAuthed, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(10,11,16,0.7)" }}>
@@ -468,9 +464,6 @@ function AuthGateModal({ onAuthed, onClose }) {
   );
 }
 
-/* =========================================================================
-   AUDIO PLAYER (single shared <audio>, waveform on the playing row)
-   ========================================================================= */
 function useAudioPlayer() {
   const audioRef = useRef(null);
   const [playingId, setPlayingId] = useState(null);
@@ -521,9 +514,6 @@ function Waveform() {
   );
 }
 
-/* =========================================================================
-   PAGES
-   ========================================================================= */
 function Home({ go, onEnterGospel }) {
   return (
     <div className="ir-fade-in space-y-14 pb-10">
@@ -935,7 +925,7 @@ function About() {
         <h2 className="ir-display text-3xl" style={{ color: COLORS.parchment }}>About Integrity Records</h2>
         <p className="ir-body text-sm mt-1" style={{ color: "#9aa0b4" }}>Who we are, what we sell, and how to reach us.</p>
       </div>
-      
+
       <section className="rounded-lg p-5" style={{ background: COLORS.panel, border: `1px solid ${COLORS.line}` }}>
         <h3 className="ir-display text-lg mb-2" style={{ color: COLORS.parchment }}>Our story</h3>
         <p className="ir-body text-sm leading-relaxed" style={{ color: COLORS.offwhite }}>
@@ -1035,23 +1025,8 @@ function CartPage({ cart, removeFromCart, onCheckoutClick, guideStep }) {
   );
 }
 
-/* =========================================================================
-   STRIPE CONFIG
-   -------------------------------------------------------------------------
-   A Stripe secret key can never live in this file — it ships to every
-   visitor's browser, so anyone could read it and charge things to your
-   account. Real payments need a small backend that holds the secret key
-   and creates the Checkout Session; this app just calls that backend.
+const STRIPE_CHECKOUT_ENDPOINT = "/api/create-checkout-session";
 
-   Once you deploy the backend (see create-checkout-session.js provided
-   alongside this file), paste its URL below. Until then, this stays
-   empty and checkout runs in demo mode.
-   ========================================================================= */
-const STRIPE_CHECKOUT_ENDPOINT = "/api/create-checkout-session"; // e.g. "https://your-backend.example.com/create-checkout-session"
-
-/* =========================================================================
-   CHECKOUT STEPPER — visual 1-2-3 guide shown at the top of the modal
-   ========================================================================= */
 function CheckoutStepper({ stage }) {
   const steps = [
     { key: "review", label: "Review" },
@@ -1087,19 +1062,6 @@ function CheckoutStepper({ stage }) {
   );
 }
 
-/* =========================================================================
-   CHECKOUT MODAL
-   -------------------------------------------------------------------------
-   Three visible stages: Review -> Account -> Payment. If the shopper is
-   already signed in, the Account stage is skipped automatically.
-
-   Demo mode (STRIPE_CHECKOUT_ENDPOINT empty): simulates a successful
-   payment locally so the rest of the app can be tested end to end.
-
-   Live mode (endpoint set): posts the cart to your backend, which creates
-   a real Stripe Checkout Session and returns its URL. The browser is then
-   redirected to Stripe's own hosted checkout page to collect payment.
-   ========================================================================= */
 function CheckoutModal({ cart, user, onClose, onComplete }) {
   const [step, setStep] = useState(user ? "review" : "review");
   const [error, setError] = useState("");
@@ -1136,7 +1098,7 @@ function CheckoutModal({ cart, user, onClose, onComplete }) {
       if (!res.ok) throw new Error("Checkout session request failed");
       const data = await res.json();
       if (!data.url) throw new Error("No checkout URL returned");
-      window.location.href = data.url; // hand off to Stripe's hosted checkout page
+      window.location.href = data.url;
     } catch (err) {
       setError("Couldn't start checkout. Please try again in a moment.");
       setStep("review");
@@ -1218,12 +1180,6 @@ function CheckoutModal({ cart, user, onClose, onComplete }) {
   );
 }
 
-/* =========================================================================
-   HEADER / NAV
-   ========================================================================= */
-/* =========================================================================
-   HEADER / NAV
-   ========================================================================= */
 function Header({ page, go, cartCount, guideStep, onCartIconClick, user, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
 const tabs = [
@@ -1311,16 +1267,21 @@ const tabs = [
 }
 
 /* =========================================================================
-   ROOT APP
+   INNER APP — everything that needs Router hooks (useNavigate/useLocation)
+   lives here, inside <BrowserRouter>.
    ========================================================================= */
-export default function App() {
-  const [page, setPage] = useState("home");
+function AppInner() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const page = pageIdFromPath(location.pathname);
+  const go = (id) => navigate(ROUTE_PATHS[id] || "/");
+
   const [cart, setCart] = useState([]);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [library, setLibrary] = useState({ ...DEFAULT_LIBRARY });
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [guideStep, setGuideStep] = useState(null); // null | "cart" | "checkout"
+  const [guideStep, setGuideStep] = useState(null);
   const [gospelGateOpen, setGospelGateOpen] = useState(false);
   const player = useAudioPlayer();
 
@@ -1342,10 +1303,10 @@ export default function App() {
   }, [user, authChecked]);
 
   useEffect(() => {
-    const openSub = () => setPage("subscription");
+    const openSub = () => navigate(ROUTE_PATHS.subscription);
     window.addEventListener("open-subscribe", openSub);
     return () => window.removeEventListener("open-subscribe", openSub);
-  }, []);
+  }, [navigate]);
 
   const addToCart = (item) => {
     setCart((prev) => (prev.some((c) => c.id === item.id) ? prev : [...prev, item]));
@@ -1355,7 +1316,7 @@ export default function App() {
 
   const handleCartIconClick = () => {
     if (guideStep === "cart") setGuideStep("checkout");
-    setPage("cart");
+    navigate(ROUTE_PATHS.cart);
   };
 
   const handleCheckoutClick = () => {
@@ -1364,21 +1325,21 @@ export default function App() {
   };
 
   const handleEnterGospel = () => {
-  if (user) {
-    setPage("gospel-connection");
-    captureGospelLead(user);
-  } else {
-    setGospelGateOpen(true);
-  }
-};
+    if (user) {
+      navigate(ROUTE_PATHS["gospel-connection"]);
+      captureGospelLead(user);
+    } else {
+      setGospelGateOpen(true);
+    }
+  };
 
   const handleLogout = async () => {
     await signOut(auth);
-    setPage("home");
+    navigate(ROUTE_PATHS.home);
   };
 
   const completeCheckout = async () => {
-    if (!user) return; // account step guarantees this shouldn't happen, but guard anyway
+    if (!user) return;
     const next = {
       ringtones: [...library.ringtones],
       ebooks: [...(library.ebooks || [])],
@@ -1403,7 +1364,7 @@ export default function App() {
       <GlobalStyle />
       <Header
         page={page}
-        go={setPage}
+        go={go}
         cartCount={cart.length}
         guideStep={guideStep}
         onCartIconClick={handleCartIconClick}
@@ -1411,22 +1372,26 @@ export default function App() {
         onLogout={handleLogout}
       />
       <main className="max-w-5xl mx-auto px-4 md:px-6 pt-6">
-        {page === "home" && <Home go={setPage} onEnterGospel={handleEnterGospel} />}
-        {page === "ringtones" && <Ringtones player={player} cart={cart} addToCart={addToCart} library={library} />}
-        {page === "subscription" && <Subscription addToCart={addToCart} library={library} />}
-        {page === "shop" && <Shop addToCart={addToCart} cart={cart} library={library} />}
-        {page === "journal" && <Journal />}
-        {page === "cart" && (
-          <CartPage cart={cart} removeFromCart={removeFromCart} onCheckoutClick={handleCheckoutClick} guideStep={guideStep} />
-        )}
-        {page === "about" && <About />}
-        {page === "support" && <SupportUs />}
-        {page === "gospel-connection" && (
-         <GospelConnection
-            isSubscriber={!!library.subscription}
-            currentUser={{ id: user?.uid || "guest", name: user?.email || "Member", avatarHue: "#7A2E2E" }}
+        <Routes>
+          <Route path="/" element={<Home go={go} onEnterGospel={handleEnterGospel} />} />
+          <Route path="/ringtones" element={<Ringtones player={player} cart={cart} addToCart={addToCart} library={library} />} />
+          <Route path="/subscription" element={<Subscription addToCart={addToCart} library={library} />} />
+          <Route path="/shop" element={<Shop addToCart={addToCart} cart={cart} library={library} />} />
+          <Route path="/journal" element={<Journal />} />
+          <Route path="/cart" element={<CartPage cart={cart} removeFromCart={removeFromCart} onCheckoutClick={handleCheckoutClick} guideStep={guideStep} />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/support" element={<SupportUs />} />
+          <Route
+            path="/gospel-connection"
+            element={
+              <GospelConnection
+                isSubscriber={!!library.subscription}
+                currentUser={{ id: user?.uid || "guest", name: user?.email || "Member", avatarHue: "#7A2E2E" }}
+              />
+            }
           />
-        )}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
       <footer className="max-w-5xl mx-auto px-4 md:px-6 py-8 text-center space-y-2">
@@ -1434,10 +1399,10 @@ export default function App() {
           INTEGRITY RECORDS — NO FINE PRINT, NO TAKING ADVANTAGE. JUST MUSIC MADE FOR GOD.
         </p>
         <div className="flex items-center justify-center gap-4 text-xs ir-body">
-          <button onClick={() => setPage("about")} style={{ color: "#7a8099" }}>About</button>
+          <button onClick={() => go("about")} style={{ color: "#7a8099" }}>About</button>
           <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: "#7a8099" }}>Contact</a>
-          <button onClick={() => setPage("about")} style={{ color: "#7a8099" }}>Refund policy</button>
-          <button onClick={() => setPage("about")} style={{ color: "#7a8099" }}>Terms</button>
+          <button onClick={() => go("about")} style={{ color: "#7a8099" }}>Refund policy</button>
+          <button onClick={() => go("about")} style={{ color: "#7a8099" }}>Terms</button>
         </div>
       </footer>
 
@@ -1451,15 +1416,23 @@ export default function App() {
       )}
 
       {gospelGateOpen && (
-  <AuthGateModal
-    onClose={() => setGospelGateOpen(false)}
-    onAuthed={(authedUser) => {
-      setGospelGateOpen(false);
-      setPage("gospel-connection");
-      captureGospelLead(authedUser);
-    }}
-  />
-)}
+        <AuthGateModal
+          onClose={() => setGospelGateOpen(false)}
+          onAuthed={(authedUser) => {
+            setGospelGateOpen(false);
+            navigate(ROUTE_PATHS["gospel-connection"]);
+            captureGospelLead(authedUser);
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppInner />
+    </BrowserRouter>
   );
 }
