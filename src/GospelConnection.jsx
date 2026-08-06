@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Heart, MessageCircle, Send, Lock, Menu, X, ChevronRight,
@@ -11,21 +10,21 @@ import {
 import { db } from "./firebaseConfig";
 
 /* =========================================================================
-   GOSPEL CONNECTION — multi-room version
+   GOSPEL CONNECTION — multi-room version, each room its own light theme
    -------------------------------------------------------------------------
-   Rooms: Community, Prayer & Testimony (with video placeholder), One-on-One
-   Counseling (Calendly), Meeting Room (Zoom link, admin/owner only edits).
+   Rooms: Community (warm gold), Prayer & Testimony (soft blue), One-on-One
+   Counseling (gentle green), Meeting Room (warm coral). The idea is that
+   stepping into a room after the wormhole should feel like walking into a
+   different, light-filled room of a house — not the same dark shell with
+   a different label.
 
-   Admin permissions: any signed-in guest can unlock admin/owner-level
-   controls (editing the Meeting Room Zoom link + private/public toggle) by
-   entering a one-time admin code. Change ADMIN_CODE below to whatever you
-   want it to be — treat it like a shared password, not a secret key: since
-   this runs in the browser, anyone who really digs through the site's code
-   (or the Firestore rules) could find it. It's a good gate for trusted
-   guests, not a defense against a determined attacker.
+   Admin permissions: any signed-in guest can unlock host-level controls
+   (editing the Meeting Room Zoom link + private/public toggle) by entering
+   a one-time admin code (see ADMIN_CODE below). This is a soft gate, not
+   real security — anyone who digs through the site's code could find the
+   code — but it's fine for handing out to a few trusted guest hosts.
 
-   Props (unchanged from the single-feed version, so this is a drop-in
-   replacement for the existing GospelConnection.jsx):
+   Props (unchanged, so this drops straight into the existing App.jsx):
    - isSubscriber: boolean
    - currentUser: { id, name, avatarHue }
    ========================================================================= */
@@ -36,6 +35,38 @@ const CREAM = "#FAF6EE";
 
 // Change this to whatever code you want to hand out to trusted guests.
 const ADMIN_CODE = "GC-ADMIN-2026";
+
+/* Per-room light color themes */
+const ROOM_THEMES = {
+  community: {
+    bg: "linear-gradient(180deg, #FFF9EC 0%, #FBEBC3 100%)",
+    accent: "#9C7A2E",
+    accentSoft: "#EFDDA6",
+    cardBorder: "#EADFB8",
+    verse: "#8A6D2F",
+  },
+  prayer: {
+    bg: "linear-gradient(180deg, #F1F5FC 0%, #DCE7F8 100%)",
+    accent: "#3C5D93",
+    accentSoft: "#C7D6F0",
+    cardBorder: "#D2DFF3",
+    verse: "#3C5D93",
+  },
+  counseling: {
+    bg: "linear-gradient(180deg, #F1FAF2 0%, #DBEEDD 100%)",
+    accent: "#3E7D4C",
+    accentSoft: "#C6E6CB",
+    cardBorder: "#D3EAD6",
+    verse: "#3E7D4C",
+  },
+  meeting: {
+    bg: "linear-gradient(180deg, #FFF1EA 0%, #FBDCC7 100%)",
+    accent: "#C1622E",
+    accentSoft: "#F4CBAE",
+    cardBorder: "#F3D7C2",
+    verse: "#C1622E",
+  },
+};
 
 const ROOMS = [
   { id: "community", label: "Community Room", icon: Users },
@@ -72,34 +103,34 @@ function Avatar({ name, hue = "#7A2E2E", size = 40 }) {
   );
 }
 
-function LockedGate({ label }) {
+function LockedGate({ label, theme }) {
   return (
     <div
       style={{
-        background: NAVY, borderRadius: 16, padding: "40px 24px",
-        textAlign: "center", color: "white", maxWidth: 480, margin: "24px auto",
-        border: `1px solid ${GOLD}55`,
+        background: "white", borderRadius: 16, padding: "40px 24px",
+        textAlign: "center", maxWidth: 480, margin: "24px auto",
+        border: `1px solid ${theme.cardBorder}`,
       }}
     >
       <div
         style={{
-          width: 52, height: 52, borderRadius: "50%", background: `${GOLD}22`,
+          width: 52, height: 52, borderRadius: "50%", background: theme.accentSoft,
           display: "flex", alignItems: "center", justifyContent: "center",
           margin: "0 auto 18px",
         }}
       >
-        <Lock size={22} color={GOLD} />
+        <Lock size={22} color={theme.accent} />
       </div>
-      <h3 style={{ fontFamily: "Georgia, serif", fontSize: 19, margin: "0 0 8px", color: GOLD }}>
+      <h3 style={{ fontFamily: "Georgia, serif", fontSize: 19, margin: "0 0 8px", color: theme.accent }}>
         {label || "This room is for subscribers"}
       </h3>
-      <p style={{ color: "#C9D2E0", fontSize: 13.5, lineHeight: 1.6, margin: "0 0 18px" }}>
+      <p style={{ color: "#556", fontSize: 13.5, lineHeight: 1.6, margin: "0 0 18px" }}>
         Subscribe to Integrity Records to unlock this room, or ask about an admin invite
         if you're joining as a guest host.
       </p>
       <button
         style={{
-          background: GOLD, color: NAVY, border: "none", borderRadius: 999,
+          background: theme.accent, color: "white", border: "none", borderRadius: 999,
           padding: "10px 24px", fontWeight: 700, fontSize: 13.5, cursor: "pointer",
         }}
         onClick={() => window.dispatchEvent(new CustomEvent("open-subscribe"))}
@@ -110,26 +141,24 @@ function LockedGate({ label }) {
   );
 }
 
-/* Video placeholder used in the Prayer & Testimony room (and reused in
-   Meeting Room) — swap this out for a real embed whenever you have one. */
-function VideoPlaceholder({ title, subtitle }) {
+function VideoPlaceholder({ title, subtitle, theme }) {
   return (
     <div
       style={{
-        marginBottom: 20, borderRadius: 12, background: `${GOLD}15`,
-        border: `1px solid ${GOLD}55`, padding: "28px 20px", textAlign: "center",
+        marginBottom: 20, borderRadius: 12, background: "white",
+        border: `1px solid ${theme.cardBorder}`, padding: "28px 20px", textAlign: "center",
       }}
     >
-      <Video size={22} color={GOLD} style={{ marginBottom: 8 }} />
+      <Video size={22} color={theme.accent} style={{ marginBottom: 8 }} />
       <div style={{ fontSize: 14, color: NAVY, fontWeight: 700, marginBottom: 4 }}>
         {title}
       </div>
-      <div style={{ fontSize: 13, color: "#8A6D2F" }}>{subtitle || "Coming soon"}</div>
+      <div style={{ fontSize: 13, color: theme.accent }}>{subtitle || "Coming soon"}</div>
     </div>
   );
 }
 
-function Composer({ currentUser, roomId, onPosted }) {
+function Composer({ currentUser, roomId, onPosted, theme }) {
   const [text, setText] = useState("");
   const [posting, setPosting] = useState(false);
 
@@ -158,7 +187,7 @@ function Composer({ currentUser, roomId, onPosted }) {
   }
 
   return (
-    <div style={{ background: "white", borderRadius: 14, padding: 16, marginBottom: 20, border: "1px solid #E7E1D3" }}>
+    <div style={{ background: "white", borderRadius: 14, padding: 16, marginBottom: 20, border: `1px solid ${theme.cardBorder}` }}>
       <div style={{ display: "flex", gap: 12 }}>
         <Avatar name={currentUser.name} hue={currentUser.avatarHue} />
         <textarea
@@ -169,6 +198,7 @@ function Composer({ currentUser, roomId, onPosted }) {
           style={{
             flex: 1, border: "none", outline: "none", resize: "none",
             fontSize: 14.5, fontFamily: "inherit", color: "#333", paddingTop: 8,
+            background: "transparent",
           }}
         />
       </div>
@@ -177,7 +207,7 @@ function Composer({ currentUser, roomId, onPosted }) {
           onClick={handlePost}
           disabled={posting || !text.trim()}
           style={{
-            background: NAVY, color: "white", border: "none", borderRadius: 999,
+            background: theme.accent, color: "white", border: "none", borderRadius: 999,
             padding: "8px 20px", fontSize: 13.5, fontWeight: 700, cursor: "pointer",
             opacity: posting || !text.trim() ? 0.5 : 1,
             display: "flex", alignItems: "center", gap: 6,
@@ -190,7 +220,7 @@ function Composer({ currentUser, roomId, onPosted }) {
   );
 }
 
-function CommentThread({ post, currentUser }) {
+function CommentThread({ post, currentUser, theme }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
 
@@ -217,11 +247,11 @@ function CommentThread({ post, currentUser }) {
   }
 
   return (
-    <div style={{ borderTop: "1px solid #EEE7D8", marginTop: 12, paddingTop: 12 }}>
+    <div style={{ borderTop: `1px solid ${theme.cardBorder}`, marginTop: 12, paddingTop: 12 }}>
       {comments.map((c) => (
         <div key={c.id} style={{ display: "flex", gap: 10, marginBottom: 10 }}>
           <Avatar name={c.authorName} hue={c.authorHue} size={30} />
-          <div style={{ background: CREAM, borderRadius: 12, padding: "8px 12px", flex: 1 }}>
+          <div style={{ background: theme.accentSoft, borderRadius: 12, padding: "8px 12px", flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 12.5, color: NAVY }}>{c.authorName}</div>
             <div style={{ fontSize: 13.5, color: "#444" }}>{c.text}</div>
           </div>
@@ -235,7 +265,7 @@ function CommentThread({ post, currentUser }) {
           onKeyDown={(e) => e.key === "Enter" && submitComment()}
           placeholder="Write a comment..."
           style={{
-            flex: 1, border: "1px solid #E7E1D3", borderRadius: 999,
+            flex: 1, border: `1px solid ${theme.cardBorder}`, borderRadius: 999,
             padding: "7px 14px", fontSize: 13, outline: "none",
           }}
         />
@@ -244,7 +274,7 @@ function CommentThread({ post, currentUser }) {
   );
 }
 
-function PostCard({ post, currentUser }) {
+function PostCard({ post, currentUser, theme }) {
   const [showComments, setShowComments] = useState(false);
   const liked = post.likes?.includes(currentUser.id);
 
@@ -256,7 +286,7 @@ function PostCard({ post, currentUser }) {
   }
 
   return (
-    <div style={{ background: "white", borderRadius: 14, padding: 16, marginBottom: 16, border: "1px solid #E7E1D3" }}>
+    <div style={{ background: "white", borderRadius: 14, padding: 16, marginBottom: 16, border: `1px solid ${theme.cardBorder}` }}>
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 10 }}>
         <Avatar name={post.authorName} hue={post.authorHue} />
         <div>
@@ -265,7 +295,7 @@ function PostCard({ post, currentUser }) {
         </div>
       </div>
       {post.text && <p style={{ fontSize: 14.5, color: "#333", lineHeight: 1.6, margin: "0 0 10px" }}>{post.text}</p>}
-      <div style={{ display: "flex", gap: 20, paddingTop: 8, borderTop: "1px solid #F0EBDC" }}>
+      <div style={{ display: "flex", gap: 20, paddingTop: 8, borderTop: `1px solid ${theme.cardBorder}` }}>
         <button
           onClick={toggleLike}
           style={{
@@ -285,13 +315,13 @@ function PostCard({ post, currentUser }) {
           <MessageCircle size={17} /> {post.commentCount || 0}
         </button>
       </div>
-      {showComments && <CommentThread post={post} currentUser={currentUser} />}
+      {showComments && <CommentThread post={post} currentUser={currentUser} theme={theme} />}
     </div>
   );
 }
 
 /* Generic room feed used by Community + Prayer & Testimony */
-function RoomFeed({ roomId, roomLabel, currentUser, canPost, showVideo, videoTitle, videoSubtitle }) {
+function RoomFeed({ roomId, roomLabel, currentUser, canPost, showVideo, videoTitle, videoSubtitle, theme }) {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -306,24 +336,24 @@ function RoomFeed({ roomId, roomLabel, currentUser, canPost, showVideo, videoTit
 
   return (
     <div>
-      {showVideo && <VideoPlaceholder title={videoTitle} subtitle={videoSubtitle} />}
-      {canPost && <Composer currentUser={currentUser} roomId={roomId} onPosted={() => {}} />}
+      {showVideo && <VideoPlaceholder title={videoTitle} subtitle={videoSubtitle} theme={theme} />}
+      {canPost && <Composer currentUser={currentUser} roomId={roomId} onPosted={() => {}} theme={theme} />}
       {posts.length === 0 ? (
-        <p style={{ textAlign: "center", color: "#999", fontSize: 14, marginTop: 24 }}>
+        <p style={{ textAlign: "center", color: "#778", fontSize: 14, marginTop: 24 }}>
           No posts yet in {roomLabel} — be the first to share something.
         </p>
       ) : (
-        posts.map((post) => <PostCard key={post.id} post={post} currentUser={currentUser} />)
+        posts.map((post) => <PostCard key={post.id} post={post} currentUser={currentUser} theme={theme} />)
       )}
     </div>
   );
 }
 
-function CounselingRoom({ allowed }) {
-  if (!allowed) return <LockedGate label="One-on-One Counseling is for subscribers" />;
+function CounselingRoom({ allowed, theme }) {
+  if (!allowed) return <LockedGate label="One-on-One Counseling is for subscribers" theme={theme} />;
   return (
     <div style={{ textAlign: "center", padding: "20px 4px" }}>
-      <p style={{ color: "#555", fontSize: 14.5, lineHeight: 1.6, marginBottom: 20 }}>
+      <p style={{ color: "#445", fontSize: 14.5, lineHeight: 1.6, marginBottom: 20 }}>
         Book a free 30-minute one-on-one session — a space to talk, pray, or just be heard.
       </p>
       <a
@@ -331,7 +361,7 @@ function CounselingRoom({ allowed }) {
         target="_blank"
         rel="noopener noreferrer"
         style={{
-          display: "inline-block", background: GOLD, color: NAVY, fontWeight: 700,
+          display: "inline-block", background: theme.accent, color: "white", fontWeight: 700,
           fontSize: 15, padding: "14px 28px", borderRadius: 999, textDecoration: "none",
         }}
       >
@@ -341,10 +371,7 @@ function CounselingRoom({ allowed }) {
   );
 }
 
-/* Meeting Room — Zoom link + video placeholder. Editable only by
-   owner/admin; everyone else just sees the join button (or a "private"
-   notice if the host has it toggled off). */
-function MeetingRoom({ allowed, isAdmin }) {
+function MeetingRoom({ allowed, isAdmin, theme }) {
   const [state, setState] = useState({ zoomLink: "", isPrivate: false });
   const [loaded, setLoaded] = useState(false);
   const [draftLink, setDraftLink] = useState("");
@@ -367,7 +394,7 @@ function MeetingRoom({ allowed, isAdmin }) {
     setTimeout(() => setSaved(false), 1200);
   }
 
-  if (!allowed) return <LockedGate label="The Meeting Room is for subscribers" />;
+  if (!allowed) return <LockedGate label="The Meeting Room is for subscribers" theme={theme} />;
   if (!loaded) return null;
 
   return (
@@ -375,10 +402,11 @@ function MeetingRoom({ allowed, isAdmin }) {
       <VideoPlaceholder
         title="Live meeting"
         subtitle={state.zoomLink ? "Tap below to join when it's time" : "No meeting link set yet"}
+        theme={theme}
       />
 
       {isAdmin && (
-        <div style={{ background: "white", borderRadius: 14, padding: 16, marginBottom: 20, border: "1px solid #E7E1D3" }}>
+        <div style={{ background: "white", borderRadius: 14, padding: 16, marginBottom: 20, border: `1px solid ${theme.cardBorder}` }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: NAVY, marginBottom: 10 }}>
             Host controls
           </div>
@@ -387,7 +415,7 @@ function MeetingRoom({ allowed, isAdmin }) {
             onChange={(e) => setDraftLink(e.target.value)}
             placeholder="Paste the Zoom link here"
             style={{
-              width: "100%", border: "1px solid #E7E1D3", borderRadius: 8,
+              width: "100%", border: `1px solid ${theme.cardBorder}`, borderRadius: 8,
               padding: "10px 12px", fontSize: 13.5, outline: "none", marginBottom: 10,
               boxSizing: "border-box",
             }}
@@ -397,7 +425,7 @@ function MeetingRoom({ allowed, isAdmin }) {
               onClick={() => save({ zoomLink: draftLink, isPrivate: !state.isPrivate })}
               style={{
                 display: "flex", alignItems: "center", gap: 6, background: "none",
-                border: `1px solid ${GOLD}`, color: NAVY, borderRadius: 999,
+                border: `1px solid ${theme.accent}`, color: theme.accent, borderRadius: 999,
                 padding: "6px 14px", fontSize: 12.5, fontWeight: 600, cursor: "pointer",
               }}
             >
@@ -406,7 +434,7 @@ function MeetingRoom({ allowed, isAdmin }) {
             <button
               onClick={() => save({ zoomLink: draftLink, isPrivate: state.isPrivate })}
               style={{
-                background: NAVY, color: "white", border: "none", borderRadius: 999,
+                background: theme.accent, color: "white", border: "none", borderRadius: 999,
                 padding: "7px 16px", fontSize: 12.5, fontWeight: 700, cursor: "pointer",
               }}
             >
@@ -417,7 +445,7 @@ function MeetingRoom({ allowed, isAdmin }) {
       )}
 
       {!isAdmin && state.isPrivate && (
-        <p style={{ textAlign: "center", color: "#999", fontSize: 14 }}>
+        <p style={{ textAlign: "center", color: "#778", fontSize: 14 }}>
           <Lock size={14} style={{ verticalAlign: "-2px", marginRight: 4 }} />
           This meeting is currently private.
         </p>
@@ -430,7 +458,7 @@ function MeetingRoom({ allowed, isAdmin }) {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              display: "block", textAlign: "center", background: GOLD, color: NAVY,
+              display: "block", textAlign: "center", background: theme.accent, color: "white",
               fontWeight: 700, fontSize: 15, padding: "14px 20px", borderRadius: 999,
               textDecoration: "none",
             }}
@@ -438,14 +466,13 @@ function MeetingRoom({ allowed, isAdmin }) {
             Join the Meeting
           </a>
         ) : (
-          <p style={{ textAlign: "center", color: "#999", fontSize: 14 }}>No meeting link has been posted yet.</p>
+          <p style={{ textAlign: "center", color: "#778", fontSize: 14 }}>No meeting link has been posted yet.</p>
         )
       )}
     </div>
   );
 }
 
-/* Small modal for redeeming an admin code */
 function AdminCodeModal({ currentUser, onClose, onGranted }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -531,49 +558,55 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
 
   const allowedForGatedRooms = isSubscriber || isAdmin;
   const activeRoomMeta = ROOMS.find((r) => r.id === activeRoom);
+  const theme = ROOM_THEMES[activeRoom];
 
   return (
-    <div style={{ maxWidth: 560, margin: "0 auto" }}>
-      {/* Top bar with breadcrumb / menu icon */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", borderBottom: "1px solid #E7E1D3", background: "white" }}>
+    <div>
+      {/* Top bar with breadcrumb / menu icon — stays neutral so it reads as
+          the doorway/hallway between rooms, not part of any one room */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", borderBottom: "1px solid #22283A", background: NAVY }}>
         <button onClick={() => setMenuOpen(true)} aria-label="Open rooms menu" style={{ background: "none", border: "none", cursor: "pointer", padding: 6, display: "flex" }}>
-          <Menu size={22} color={NAVY} />
+          <Menu size={22} color={GOLD} />
         </button>
-        <span style={{ fontSize: 13.5, color: "#999" }}>Gospel Connection</span>
-        <ChevronRight size={14} color="#CCC" />
-        <span style={{ fontSize: 13.5, color: NAVY, fontWeight: 700 }}>{activeRoomMeta?.label}</span>
+        <span style={{ fontSize: 13.5, color: "#9aa0b4" }}>Gospel Connection</span>
+        <ChevronRight size={14} color="#5c6178" />
+        <span style={{ fontSize: 13.5, color: GOLD, fontWeight: 700 }}>{activeRoomMeta?.label}</span>
         <button
           onClick={() => setAdminModalOpen(true)}
-          style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", opacity: 0.5, display: "flex" }}
+          style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", opacity: 0.7, display: "flex" }}
           aria-label="Enter admin code"
         >
-          <KeyRound size={16} color={isAdmin ? GOLD : "#AAA"} />
+          <KeyRound size={16} color={isAdmin ? GOLD : "#5c6178"} />
         </button>
       </div>
 
-      <div style={{ padding: "20px 16px 60px" }}>
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <p style={{ color: "#8A6D2F", fontSize: 13.5, fontStyle: "italic", margin: 0 }}>
-            "Let us consider how we may spur one another on toward love and good deeds." — Hebrews 10:24
-          </p>
-        </div>
+      {/* Room body — full-bleed light themed background, distinct per room */}
+      <div style={{ background: theme.bg, minHeight: "70vh" }}>
+        <div style={{ maxWidth: 560, margin: "0 auto", padding: "28px 16px 60px" }}>
+          <div style={{ textAlign: "center", marginBottom: 22 }}>
+            <p style={{ color: theme.verse, fontSize: 13.5, fontStyle: "italic", margin: 0 }}>
+              "Let us consider how we may spur one another on toward love and good deeds." — Hebrews 10:24
+            </p>
+          </div>
 
-        {activeRoom === "community" && (
-          <RoomFeed roomId="community" roomLabel="Community Room" currentUser={currentUser} canPost />
-        )}
-        {activeRoom === "prayer" && (
-          <RoomFeed
-            roomId="prayer"
-            roomLabel="Prayer & Testimony Room"
-            currentUser={currentUser}
-            canPost
-            showVideo
-            videoTitle="Prayer service"
-            videoSubtitle="Coming soon"
-          />
-        )}
-        {activeRoom === "counseling" && <CounselingRoom allowed={allowedForGatedRooms} />}
-        {activeRoom === "meeting" && <MeetingRoom allowed={allowedForGatedRooms} isAdmin={isAdmin} />}
+          {activeRoom === "community" && (
+            <RoomFeed roomId="community" roomLabel="Community Room" currentUser={currentUser} canPost theme={theme} />
+          )}
+          {activeRoom === "prayer" && (
+            <RoomFeed
+              roomId="prayer"
+              roomLabel="Prayer & Testimony Room"
+              currentUser={currentUser}
+              canPost
+              showVideo
+              videoTitle="Prayer service"
+              videoSubtitle="Coming soon"
+              theme={theme}
+            />
+          )}
+          {activeRoom === "counseling" && <CounselingRoom allowed={allowedForGatedRooms} theme={theme} />}
+          {activeRoom === "meeting" && <MeetingRoom allowed={allowedForGatedRooms} isAdmin={isAdmin} theme={theme} />}
+        </div>
       </div>
 
       {/* Slide-in drawer */}
@@ -598,13 +631,14 @@ export default function GospelConnection({ isSubscriber, currentUser }) {
               const Icon = room.icon;
               const active = room.id === activeRoom;
               const gated = (room.id === "counseling" || room.id === "meeting") && !allowedForGatedRooms;
+              const roomTheme = ROOM_THEMES[room.id];
               return (
                 <button
                   key={room.id}
                   onClick={() => { setActiveRoom(room.id); setMenuOpen(false); }}
                   style={{
                     display: "flex", alignItems: "center", gap: 12,
-                    background: active ? `${GOLD}22` : "none",
+                    background: active ? `${roomTheme.accent}33` : "none",
                     border: "none", borderRadius: 10, padding: "12px 10px", marginBottom: 4, cursor: "pointer",
                     color: active ? GOLD : "#C9D2E0", fontSize: 14.5, fontWeight: active ? 700 : 500, textAlign: "left",
                   }}
