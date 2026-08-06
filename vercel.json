@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/download.js": {
-      "includeFiles": "ebooks-private/**"
-    }
-  }
-}
