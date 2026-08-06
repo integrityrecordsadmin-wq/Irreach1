@@ -1,4 +1,4 @@
-import GospelConnection from "./GospelConnection";
+
 import React, { useState, useEffect } from "react";
 import {
   Heart, MessageCircle, Send, Lock, Menu, X, ChevronRight,
